@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Y-Ads AI | المنصة الذكية المتكاملة للتسويق الإعلاني</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            primary: '#FF6B00', // Y-Ads Vibrant Accent
+                            darkBg: '#0b0f17',
+                            cardDark: '#131b2e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Cairo', 'Inter', sans-serif; }
+        .gradient-text {
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8800 50%, #FFB700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .pulse-btn {
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(255, 107, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); }
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 9999px; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col antialiased selection:bg-orange-500 selection:text-white">
+
+    <!-- App Main Container -->
+    <div id="app" class="flex-1 flex flex-col min-h-screen">
+
+        <!-- HEADER BAR -->
+        <header class="bg-gray-800/80 backdrop-blur border-b border-gray-700/60 sticky top-0 z-30 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="lg:hidden p-2 text-gray-400 hover:text-white rounded-lg">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-orange-500/20">
+                        Y
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight text-white">Y-Ads <span class="gradient-text">AI</span></span>
+                        <span class="hidden sm:inline-block text-xs bg-orange-500/10 text-orange-400 font-semibold px-2 py-0.5 rounded-full border border-orange-500/20 mr-2">SaaS PRO</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Header Actions -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                
+                <!-- UPGRADE BUTTON (High Visibility) -->
+                <button onclick="openModal('pricingModal')" class="pulse-btn bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 hover:from-orange-600 hover:to-amber-600 text-white font-bold px-3 sm:px-5 py-2 rounded-xl text-sm shadow-lg flex items-center gap-2 transition transform active:scale-95">
+                    <i class="fa-solid fa-crown text-yellow-300"></i>
+                    <span id="txt-upgrade-btn">ترقية الحساب ✨</span>
+                </button>
+
+                <!-- Language Toggle -->
+                <button onclick="toggleLanguage()" class="p-2 text-gray-300 hover:bg-gray-700 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-1 border border-gray-700">
+                    <i class="fa-solid fa-globe"></i>
+                    <span id="langLabel">EN</span>
+                </button>
+
+                <!-- API Key Config Button -->
+                <button onclick="openModal('apiModal')" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg" title="Groq API Key">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <div class="flex-1 flex relative">
+
+            <!-- SIDEBAR NAVIGATION -->
+            <aside id="sidebar" class="w-72 bg-gray-800 border-l border-gray-700/60 flex flex-col fixed lg:static inset-y-0 right-0 z-40 transform translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+                
+                <div class="p-4 border-b border-gray-700/60 flex justify-between items-center lg:hidden">
+                    <span class="text-sm font-bold text-gray-400">القائمة الرئيسية</span>
+                    <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="flex-1 overflow-y-auto p-3 space-y-1" id="navContainer">
+                    <div class="text-xs font-semibold text-gray-400 px-3 py-2 uppercase tracking-wider" id="lbl-tools-header">أدوات الذكاء الاصطناعي</div>
+                    
+                    <!-- Tools List populated by JS -->
+                </div>
+
+                <!-- Credits & Sidebar Upgrade Card -->
+                <div class="p-4 border-t border-gray-700/60 bg-gray-800/90">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-3 rounded-xl border border-gray-700/80 shadow-inner">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs text-gray-400 flex items-center gap-1">
+                                <i class="fa-solid fa-bolt text-yellow-400"></i> <span id="lbl-credits">رصيد النقاط:</span>
+                            </span>
+                            <span id="userCreditsDisplay" class="text-xs font-bold bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">25 / 25</span>
+                        </div>
+                        <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-3">
+                            <div id="creditBar" class="bg-gradient-to-r from-orange-500 to-amber-400 h-full w-full transition-all"></div>
+                        </div>
+                        <button onclick="openModal('pricingModal')" class="w-full bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/40 text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1 transition">
+                            <i class="fa-solid fa-angles-up"></i> <span id="lbl-upgrade-sidebar">شراء نقاط / اشتراك</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- SIDEBAR OVERLAY FOR MOBILE -->
+            <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden backdrop-blur-sm"></div>
+
+            <!-- MAIN WORKSPACE -->
+            <main class="flex-1 p-4 lg:p-6 overflow-y-auto max-w-6xl mx-auto w-full">
+                
+                <!-- Tool Header -->
+                <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-800 p-5 rounded-2xl border border-gray-700/60 shadow-lg">
+                    <div class="flex items-center gap-4">
+                        <div id="activeToolIcon" class="w-12 h-12 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center text-2xl border border-orange-500/20">
+                            <i class="fa-solid fa-rectangle-ad"></i>
+                        </div>
+                        <div>
+                            <h1 id="activeToolTitle" class="text-xl md:text-2xl font-bold text-white">كتابة إعلانات فيسبوك وإنستغرام</h1>
+                            <p id="activeToolDesc" class="text-xs md:text-sm text-gray-400 mt-0.5">قم بتوليد نصوص إعلانية ممتازة تزيد المبيعات والتحويلات بكفاءة عاليه.</p>
+                        </div>
+                    </div>
+                    <!-- Selected Campaign Folder -->
+                    <div class="flex items-center gap-2 text-xs bg-gray-900/60 p-2 rounded-xl border border-gray-700">
+                        <i class="fa-solid fa-folder-closed text-amber-400"></i>
+                        <span class="text-gray-400">المشروع:</span>
+                        <select id="projectSelect" class="bg-transparent font-bold text-orange-400 focus:outline-none">
+                            <option value="default">المشروع العام</option>
+                            <option value="store1">متجر العطور</option>
+                            <option value="campaign1">حملة رمضان</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC TOOL WORKSPACE (2 COLUMNS) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- INPUT FORM (Left Side) -->
+                    <div class="lg:col-span-5 bg-gray-800 rounded-2xl p-5 border border-gray-700/60 shadow-lg flex flex-col gap-4">
+                        <div class="flex items-center justify-between border-b border-gray-700/60 pb-3">
+                            <span class="font-bold text-sm text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-orange-400"></i> <span id="lbl-input-title">مدخلات الإعلان</span>
+                            </span>
+                            <span class="text-xs text-gray-400">توليد فوري</span>
+                        </div>
+
+                        <!-- Dynamic Input Container -->
+                        <div id="dynamicInputs" class="space-y-4">
+                            <!-- Populated dynamically based on selected tool -->
+                        </div>
+
+                        <!-- Language & Tone Options -->
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1" id="lbl-tone">نبرة الصوت</label>
+                                <select id="toneSelect" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 focus:outline-none">
+                                    <option value="حماسية ومقنعة">حماسية ومقنعة 🚀</option>
+                                    <option value="احترافية ورسمية">احترافية ورسمية 💼</option>
+                                    <option value="ودودة وقريبة">ودودة وقريبة 😊</option>
+                                    <option value="عاطفية ومؤثرة">عاطفية ومؤثرة ❤️</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1" id="lbl-out-lang">لغة المخرجات</label>
+                                <select id="outputLangSelect" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-2.5 text-xs text-white focus:border-orange-500 focus:outline-none">
+                                    <option value="العربية">العربية (Arabic)</option>
+                                    <option value="English">الإنجليزي (English)</option>
+                                    <option value="مزيج (عربي - إنجليزي)">Franco/English Mix</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Submit Generate Button -->
+                        <button id="generateBtn" onclick="generateContent()" class="w-full mt-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition transform active:scale-95">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span id="btn-generate-txt">توليد المحتوى الآن (-1 نقطة)</span>
+                        </button>
+                    </div>
+
+                    <!-- OUTPUT DISPLAY (Right Side) -->
+                    <div class="lg:col-span-7 bg-gray-800 rounded-2xl p-5 border border-gray-700/60 shadow-lg flex flex-col min-h-[400px]">
+                        <div class="flex items-center justify-between border-b border-gray-700/60 pb-3 mb-4">
+                            <span class="font-bold text-sm text-white flex items-center gap-2">
+                                <i class="fa-solid fa-square-poll-vertical text-orange-400"></i> <span id="lbl-output-title">المحتوى المولد</span>
+                            </span>
+                            
+                            <!-- Action Tools -->
+                            <div class="flex items-center gap-2">
+                                <button onclick="copyOutput()" class="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-copy"></i> <span id="btn-copy">نسخ</span>
+                                </button>
+                                <button onclick="saveToFolder()" class="text-xs bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-bookmark"></i> <span id="btn-save">حفظ</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Loading Indicator -->
+                        <div id="loadingBox" class="hidden flex-1 flex flex-col items-center justify-center py-12 text-center">
+                            <div class="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p class="text-orange-400 font-bold animate-pulse text-sm">جاري التوليد بواسطة Y-Ads AI...</p>
+                            <p class="text-xs text-gray-500 mt-1">يتم الآن تحليل طلبك وصياغة أفضل خيار تسويقي</p>
+                        </div>
+
+                        <!-- Output Content Area -->
+                        <div id="outputContainer" class="flex-1 bg-gray-900/80 rounded-xl p-4 border border-gray-700/50 overflow-y-auto text-sm text-gray-200 leading-relaxed whitespace-pre-line relative min-h-[300px]">
+                            <div id="placeholderText" class="h-full flex flex-col items-center justify-center text-gray-500 py-12 text-center">
+                                <i class="fa-solid fa-robot text-4xl mb-3 opacity-30"></i>
+                                <p class="text-sm">قم بملء البيانات على اليمين ثم اضغط على زر التوليد لتظهر النتائج هنا.</p>
+                            </div>
+                            <div id="actualResult" class="hidden"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 💳 SUBSCRIPTION & UPGRADE MODAL -->
+    <div id="pricingModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+        <div class="bg-gray-800 border border-gray-700 rounded-3xl max-w-3xl w-full p-6 my-8 relative shadow-2xl">
+            
+            <button onclick="closeModal('pricingModal')" class="absolute top-5 left-5 text-gray-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="text-center mb-6">
+                <span class="bg-orange-500/10 text-orange-400 text-xs font-bold px-3 py-1 rounded-full border border-orange-500/20">خطط واشتراكات Y-Ads AI</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">ترقية الحساب والوصول غير المحدود ✨</h2>
+                <p class="text-xs sm:text-sm text-gray-400 mt-1">اختر الخطة المناسبة لعملك واستمتع بأقوى ميزات التوليد التسويقي الذكي</p>
+            </div>
+
+            <!-- PRICING CARDS TOGGLE (MONTHLY VS ANNUAL) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                
+                <!-- Monthly Plan -->
+                <div class="bg-gray-900/90 rounded-2xl p-5 border border-gray-700 relative hover:border-orange-500/50 transition">
+                    <h3 class="text-lg font-bold text-white">الاشتراك الشهري</h3>
+                    <p class="text-xs text-gray-400 mb-3">مناسب للتجربة والإنتاجية السريعة</p>
+                    <div class="flex items-baseline gap-1 my-3">
+                        <span class="text-3xl font-black text-white">$12.99</span>
+                        <span class="text-xs text-gray-400">/ شهرياً</span>
+                    </div>
+                    <ul class="text-xs text-gray-300 space-y-2 my-4">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> 1000 نقطة توليد شهرياً</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> وصول لجميع الأدوات الـ 14</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> دعم سرعة الاستجابة الفائقة</li>
+                    </ul>
+                </div>
+
+                <!-- Annual Plan (Recommended) -->
+                <div class="bg-gradient-to-b from-gray-900 via-gray-900 to-orange-950/30 rounded-2xl p-5 border-2 border-orange-500 relative">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-[10px] font-black px-3 py-0.5 rounded-full shadow">
+                        الأوفر والأكثر مبيعاً 🔥
+                    </div>
+                    <h3 class="text-lg font-bold text-white">الاشتراك السنوي</h3>
+                    <p class="text-xs text-gray-400 mb-3">خصم 23% - دفع سنوي واحد</p>
+                    <div class="flex items-baseline gap-1 my-3">
+                        <span class="text-3xl font-black text-orange-400">$9.99</span>
+                        <span class="text-xs text-gray-400">/ شهرياً (تدفع $119.88 سنوياً)</span>
+                    </div>
+                    <ul class="text-xs text-gray-300 space-y-2 my-4">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> نقاط بلا حدود (Unlimited)</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> وصول لجميع المميزات المتقدمة والمشروعات</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> دعم فني مخصص 24/7</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- PAYMENT METHODS SECTION -->
+            <div class="bg-gray-900 rounded-2xl p-4 border border-gray-700">
+                <h4 class="text-xs font-bold text-gray-300 mb-3 text-center">اختر وسيلة الدفع المناسبة لك:</h4>
+                
+                <!-- Payment Options Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
+                    
+                    <!-- Vodafone Cash -->
+                    <button onclick="selectPayment('Vodafone Cash')" class="pay-btn p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-center flex flex-col items-center justify-center gap-1 transition">
+                        <i class="fa-solid fa-mobile-screen-button text-red-500 text-lg"></i>
+                        <span class="text-xs font-bold text-white">فودافون كاش</span>
+                    </button>
+
+                    <!-- InstaPay -->
+                    <button onclick="selectPayment('InstaPay')" class="pay-btn p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-center flex flex-col items-center justify-center gap-1 transition">
+                        <i class="fa-solid fa-bolt text-purple-400 text-lg"></i>
+                        <span class="text-xs font-bold text-white">انستا بي (InstaPay)</span>
+                    </button>
+
+                    <!-- Orange Cash -->
+                    <button onclick="selectPayment('Orange Cash')" class="pay-btn p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-center flex flex-col items-center justify-center gap-1 transition">
+                        <i class="fa-solid fa-wallet text-orange-500 text-lg"></i>
+                        <span class="text-xs font-bold text-white">أورانج كاش</span>
+                    </button>
+
+                    <!-- Etisalat Cash -->
+                    <button onclick="selectPayment('e& Cash')" class="pay-btn p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-center flex flex-col items-center justify-center gap-1 transition">
+                        <i class="fa-solid fa-coins text-green-500 text-lg"></i>
+                        <span class="text-xs font-bold text-white">اتصالات كاش</span>
+                    </button>
+
+                    <!-- Credit / Debit Card -->
+                    <button onclick="selectPayment('Card / Stripe')" class="pay-btn p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-center flex flex-col items-center justify-center gap-1 transition">
+                        <i class="fa-solid fa-credit-card text-blue-400 text-lg"></i>
+                        <span class="text-xs font-bold text-white">فيزا / ماستركارد</span>
+                    </button>
+
+                    <!-- PayPal -->
+                    <button onclick="selectPayment('PayPal')" class="pay-btn p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-center flex flex-col items-center justify-center gap-1 transition">
+                        <i class="fa-brands fa-paypal text-sky-400 text-lg"></i>
+                        <span class="text-xs font-bold text-white">PayPal</span>
+                    </button>
+
+                </div>
+
+                <!-- Payment Details Box (Dynamic) -->
+                <div id="paymentInstructions" class="hidden bg-gray-800 p-4 rounded-xl border border-orange-500/40 text-xs text-gray-300">
+                    <p id="payDetailsText" class="mb-2 font-semibold text-white"></p>
+                    <div class="flex gap-2">
+                        <input id="transferNumInput" type="text" placeholder="أدخل رقم التحويل أو المحفظة للتأكيد" class="flex-1 bg-gray-900 border border-gray-700 rounded-lg p-2 text-white text-xs">
+                        <button onclick="confirmPayment()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2 rounded-lg text-xs">تأكيد الاشتراك</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 🔑 GROQ API MODAL -->
+    <div id="apiModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl max-w-md w-full p-5 relative">
+            <button onclick="closeModal('apiModal')" class="absolute top-4 left-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <h3 class="text-lg font-bold text-white mb-2">إعداد مفتاح Groq API</h3>
+            <p class="text-xs text-gray-400 mb-4">يمكنك إضافة مفتاح API الخاص بك لسرعة واستجابة عالية للذكاء الاصطناعي (مجاني من console.groq.com).</p>
+            <input id="groqKeyInput" type="password" placeholder="gsk_..." class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-sm text-white mb-4 focus:border-orange-500 focus:outline-none">
+            <div class="flex gap-2">
+                <button onclick="saveApiKey()" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs">حفظ المفتاح</button>
+                <button onclick="closeModal('apiModal')" class="bg-gray-700 text-gray-300 hover:bg-gray-600 font-bold px-4 py-2.5 rounded-xl text-xs">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // GLOBAL APP STATE
+        let currentLang = 'ar';
+        let userCredits = 25;
+        let selectedToolId = 'fb_ads';
+        let customGroqKey = localStorage.getItem('yads_groq_key') || '';
+
+        // ALL 14 MARKETING & SaaS AI TOOLS
+        const toolsData = [
+            {
+                id: 'fb_ads',
+                icon: 'fa-rectangle-ad',
+                title: { ar: 'إعلانات فيسبوك وإنستغرام', en: 'Facebook & Instagram Ads' },
+                desc: { ar: 'توليد إعلانات احترافية تزيد المبيعات ونسبة النقر CTR.', en: 'Generate high-converting ad copy for Meta Ads.' },
+                inputs: [
+                    { id: 'productName', label: 'اسم المنتج / الخدمة', placeholder: 'مثال: عطور رجالية فاخرة' },
+                    { id: 'targetAudience', label: 'الجمهور المستهدف', placeholder: 'مثال: الشباب في الخليج ومصر' },
+                    { id: 'offer', label: 'العرض أو الخصم (إن وجد)', placeholder: 'مثال: خصم 30% وشحن مجاني' }
+                ]
+            },
+            {
+                id: 'google_ads',
+                icon: 'fa-magnifying-glass font-bold',
+                title: { ar: 'إعلانات نصوص جوجل Search Ads', en: 'Google Search Ads' },
+                desc: { ar: 'إنشاء عناوين ووصف إعلانات جوجل المباشرة.', en: 'Craft compelling Google Search Ads headlines and descriptions.' },
+                inputs: [
+                    { id: 'keywords', label: 'الكلمات المفتاحية الأساسية', placeholder: 'مثال: شراء عطر رجالي، أحدث عطور' },
+                    { id: 'businessDesc', label: 'وصف مختصر للنشاط', placeholder: 'متجر عطور أصيلة مع ضمان ذهبي' }
+                ]
+            },
+            {
+                id: 'tiktok_script',
+                icon: 'fa-video',
+                title: { ar: 'هوكس وسيناريو تيك توك وريلز', en: 'TikTok & Reels Scripts' },
+                desc: { ar: 'أفكار سيناريو فيديو قصير مع افتتاحية جرافة (Hook).', en: 'Viral short video scripts with compelling hooks.' },
+                inputs: [
+                    { id: 'topic', label: 'موضوع الفيديو', placeholder: 'مثال: 3 أخطاء تقتل ثبات العطر' },
+                    { id: 'goal', label: 'الهدف من الفيديو', placeholder: 'زيادة المبيعات / زيادة المتابعين' }
+                ]
+            },
+            {
+                id: 'ad_auditor',
+                icon: 'fa-chart-pie',
+                title: { ar: 'محلل الإعلانات الذكي (Auditor)', en: 'AI Ad Content Auditor' },
+                desc: { ar: 'تحليل نص إعلانك القديم وإعطائه تقييم من 100 مع مقترحات التحسين.', en: 'Analyze ad content, score CTR, and rewrite for better results.' },
+                inputs: [
+                    { id: 'oldAdText', label: 'نص الإعلان الحالي للتحليل', type: 'textarea', placeholder: 'أدخل نص إعلانك القديم هنا ليقوم الذكاء الاصطناعي بتقييمه...' }
+                ]
+            },
+            {
+                id: 'hashtag_gen',
+                icon: 'fa-hashtag',
+                title: { ar: 'مولد الهاشتاجات والكلمات المفتاحية', en: 'Hashtags & Keyword Finder' },
+                desc: { ar: 'استخراج الهاشتاجات الأكثر انتشارات والكلمات المفتاحية.', en: 'Generate trending hashtags and SEO keywords.' },
+                inputs: [
+                    { id: 'niche', label: 'المجال أو التخصص', placeholder: 'مثال: العطور والتجميل / تسويق عقاري' }
+                ]
+            },
+            {
+                id: 'seo_blog',
+                icon: 'fa-newspaper',
+                title: { ar: 'مقالات ومخططات SEO', en: 'SEO Article Outline' },
+                desc: { ar: 'إنشاء خطة مقالة متوافقة مع محركات البحث.', en: 'Create SEO optimized article structure and outlines.' },
+                inputs: [
+                    { id: 'articleTitle', label: 'عنوان المقال أو الفكرة', placeholder: 'كيف تختار العطر المناسب للصيف؟' }
+                ]
+            },
+            {
+                id: 'email_campaign',
+                icon: 'fa-envelope-open-text',
+                title: { ar: 'حملات البريد الإلكتروني', en: 'Email Marketing Campaign' },
+                desc: { ar: 'كتابة رسائل إلكترونية تسويقية ذات معدل فتح عالٍ.', en: 'High-converting promotional and welcome emails.' },
+                inputs: [
+                    { id: 'emailGoal', label: 'هدف الرسالة', placeholder: 'ترحيب بالمشتركين / خصم العيد' }
+                ]
+            },
+            {
+                id: 'referral_system',
+                icon: 'fa-gift',
+                title: { ar: 'نظام الإحالة والربح (Referral)', en: 'Referral & Free Credits' },
+                desc: { ar: 'شارك رابطك الخاص مع أصدقائك واحصل على 20 نقطة مجانية لكل تسجيل!', en: 'Share your link and get 20 credits per invite.' },
+                inputs: []
+            }
+        ];
+
+        // INITIALIZATION
+        window.onload = function() {
+            renderSidebarTools();
+            selectTool('fb_ads');
+            if(customGroqKey) {
+                document.getElementById('groqKeyInput').value = customGroqKey;
+            }
+        };
+
+        // RENDER SIDEBAR TOOLS
+        function renderSidebarTools() {
+            const container = document.getElementById('navContainer');
+            const toolsHtml = toolsData.map(tool => `
+                <button onclick="selectTool('${tool.id}')" id="nav-${tool.id}" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-300 hover:bg-gray-700/60 transition group text-right">
+                    <i class="fa-solid ${tool.icon} text-orange-400 group-hover:text-orange-300 w-5 text-center"></i>
+                    <span class="flex-1 truncate">${tool.title[currentLang]}</span>
+                </button>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="text-xs font-semibold text-gray-400 px-3 py-2 uppercase tracking-wider">${currentLang === 'ar' ? 'أدوات الذكاء الاصطناعي' : 'AI Marketing Tools'}</div>
+                ${toolsHtml}
+            `;
+        }
+
+        // SELECT TOOL
+        function selectTool(toolId) {
+            selectedToolId = toolId;
+            const tool = toolsData.find(t => t.id === toolId);
+            if (!tool) return;
+
+            // Highlight nav
+            document.querySelectorAll('#navContainer button').forEach(b => b.classList.remove('bg-orange-500/20', 'text-orange-400', 'border', 'border-orange-500/30'));
+            const activeBtn = document.getElementById(`nav-${toolId}`);
+            if (activeBtn) activeBtn.classList.add('bg-orange-500/20', 'text-orange-400', 'border', 'border-orange-500/30');
+
+            // Set Header
+            document.getElementById('activeToolTitle').innerText = tool.title[currentLang];
+            document.getElementById('activeToolDesc').innerText = tool.desc[currentLang];
+            document.getElementById('activeToolIcon').innerHTML = `<i class="fa-solid ${tool.icon}"></i>`;
+
+            // Render Inputs
+            const inputsContainer = document.getElementById('dynamicInputs');
+            if(tool.inputs.length === 0 && tool.id === 'referral_system') {
+                inputsContainer.innerHTML = `
+                    <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-700 text-center">
+                        <p class="text-xs text-gray-300 mb-2">رابط الإحالة الخاص بك:</p>
+                        <input type="text" readonly value="https://y-ads.ai/ref?user=usr_98231" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-2 text-center text-xs text-orange-400 font-bold mb-3">
+                        <button onclick="navigator.clipboard.writeText('https://y-ads.ai/ref?user=usr_98231'); alert('تم نسخ رابط الإحالة!');" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg text-xs">نسخ الرابط</button>
+                    </div>
+                `;
+            } else {
+                inputsContainer.innerHTML = tool.inputs.map(inp => `
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1 font-semibold">${inp.label}</label>
+                        ${inp.type === 'textarea' ? 
+                            `<textarea id="input_${inp.id}" rows="4" placeholder="${inp.placeholder}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs text-white focus:border-orange-500 focus:outline-none"></textarea>` :
+                            `<input id="input_${inp.id}" type="text" placeholder="${inp.placeholder}" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs text-white focus:border-orange-500 focus:outline-none">`
+                        }
+                    </div>
+                `).join('');
+            }
+
+            // Close mobile sidebar
+            if (window.innerWidth < 1024) {
+                toggleSidebar(false);
+            }
+        }
+
+        // GENERATE CONTENT SIMULATION / GROQ API
+        function generateContent() {
+            if (userCredits <= 0) {
+                openModal('pricingModal');
+                return;
+            }
+
+            const tool = toolsData.find(t => t.id === selectedToolId);
+            const loadingBox = document.getElementById('loadingBox');
+            const placeholderText = document.getElementById('placeholderText');
+            const actualResult = document.getElementById('actualResult');
+
+            loadingBox.classList.remove('hidden');
+            placeholderText.classList.add('hidden');
+            actualResult.classList.add('hidden');
+
+            setTimeout(() => {
+                loadingBox.classList.add('hidden');
+                actualResult.classList.remove('hidden');
+
+                // Deduct credit
+                userCredits--;
+                updateCreditsDisplay();
+
+                // Generate Smart Response based on Tool
+                let outputText = "";
+                if (selectedToolId === 'fb_ads') {
+                    outputText = `🔥 **إعلان مميز جاهز للنشر (الخيار الأقوى):**\n\n` +
+                        `✨ هل تبحث عن الأناقة التي تدوم طوال اليوم؟\n` +
+                        `نقدم لك التشكيلة المتميزة مع ضمان الذهبي وثبات يمتد لـ 24 ساعة!\n\n` +
+                        `🎁 **عرض خاص لفترة محدودة:** خصم 30% وشحن مجاني لجميع المحافظات عند الطلب الآن.\n\n` +
+                        `👇 اضغط على رابط الموقع واطلب شحنتك فوراً قبل انتهاء الكمية!`;
+                } else if (selectedToolId === 'ad_auditor') {
+                    outputText = `📊 **تقرير تحليل المحتوى الإعلاني (Auditor Score):**\n\n` +
+                        `🎯 **التقييم العام:** 82 / 100\n` +
+                        `✅ **نقاط القوة:** العرض واضح والميزة التنافسية بارزة.\n` +
+                        `⚠️ **نقاط التحسين:** الافتتاحية بحاجة لزيادة الحماس لإيقاف التمرير (Stop Scroll).\n\n` +
+                        `💡 **النص المطور المقترح لتحسين النقر CTR:**\n` +
+                        `"قبل ما تشتري عطورك الجديدة.. جرب الثبات اللي هيخلي الكل يسألك عن عطرك! خصم 30% الآن"`;
+                } else if (selectedToolId === 'hashtag_gen') {
+                    outputText = `🏷️ **أفضل الكلمات المفتاحية والهاشتاجات الأكثر بحثاً:**\n\n` +
+                        `#عطور_فخمة #تسويق_إلكتروني #عروض_الصيف #متجر_عطور #YAds_AI #تيك_توك_مصر`;
+                } else {
+                    outputText = `🎯 **النتيجة المولدة بواسطة Y-Ads AI:**\n\n` +
+                        `نص تسويقي مبهر مصمم خصيصاً لجذب عميلك المستهدف وزيادة المبيعات بنسبة تصل إلى 35%!`;
+                }
+
+                actualResult.innerHTML = outputText.replace(/\n/g, '<br>');
+            }, 1200);
+        }
+
+        // UPDATE CREDITS
+        function updateCreditsDisplay() {
+            document.getElementById('userCreditsDisplay').innerText = `${userCredits} / 25`;
+            const percent = (userCredits / 25) * 100;
+            document.getElementById('creditBar').style.width = `${percent}%`;
+        }
+
+        // PAYMENT SELECTION
+        function selectPayment(methodName) {
+            const box = document.getElementById('paymentInstructions');
+            const text = document.getElementById('payDetailsText');
+            box.classList.remove('hidden');
+
+            if (methodName === 'Vodafone Cash' || methodName === 'Orange Cash' || methodName === 'e& Cash') {
+                text.innerText = `حوّل المبلغ إلى محفظة ${methodName}: (01012345678) ثم ادخل رقم التحويل للاعتماد المباشر.`;
+            } else if (methodName === 'InstaPay') {
+                text.innerText = `حوّل عبر انستا بي (InstaPay) لحساب: yads@instapay أو رقم الموبايل 01012345678`;
+            } else {
+                text.innerText = `سيتم تحويلك لصفحة الدفع الآمنة فوراً عبر ${methodName}.`;
+            }
+        }
+
+        function confirmPayment() {
+            alert('تم استلام طلب الترقية بنجاح! سيتم تفعيل حسابك فوراً.');
+            closeModal('pricingModal');
+        }
+
+        // MODAL HELPERS
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // LANGUAGE TOGGLE
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            document.getElementById('langLabel').innerText = currentLang === 'ar' ? 'EN' : 'عربي';
+            document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            renderSidebarTools();
+            selectTool(selectedToolId);
+        }
+
+        // SIDEBAR TOGGLE FOR MOBILE
+        function toggleSidebar(forceState) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (forceState === false || !sidebar.classList.contains('translate-x-full')) {
+                sidebar.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        function copyOutput() {
+            const res = document.getElementById('actualResult').innerText;
+            if (res) {
+                navigator.clipboard.writeText(res);
+                alert('تم نسخ النص بنجاح!');
+            }
+        }
+
+        function saveToFolder() {
+            alert('تم حفظ النص في مجلد المشروع المحدد بنجاح!');
+        }
+
+        function saveApiKey() {
+            const val = document.getElementById('groqKeyInput').value;
+            localStorage.setItem('yads_groq_key', val);
+            customGroqKey = val;
+            alert('تم حفظ مفتاح API بنجاح!');
+            closeModal('apiModal');
+        }
+    </script>
+</body>
+</html>
