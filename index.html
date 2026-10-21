@@ -1,49 +1,4 @@
-window.login = async () => {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (err) {
-                alert("خطأ في تسجيل الدخول: " + err.message);
-            }
-        };
-
-        window.logout = async () => {
-            await signOut(auth);
-            location.reload();
-        };
-
-        window.generateAd = async () => {
-            if (!currentUser) {
-                alert("يرجى تسجيل الدخول أولاً لتوليد الإعلان!");
-                return;
-            }
-
-            if (userCredits < 1) {
-                alert("عذراً، لا يوجد لديك رصيد نقاط كافي!");
-                return;
-            }
-
-            const name = document.getElementById('product-name').value.trim();
-            const desc = document.getElementById('product-desc').value.trim();
-
-            if (!name) {
-                alert("يرجى كتابة اسم المنتج!");
-                return;
-            }
-
-            const btn = document.getElementById('generate-btn');
-            btn.disabled = true;
-            btn.innerHTML = <i class="fas fa-spinner fa-spin"></i> جاري التوليد...;
-
-            try {
-                const userRef = doc(db, "users", currentUser.uid);
-                await updateDoc(userRef, {
-                    credits: increment(-1)
-                });
-
-                userCredits -= 1;
-                document.getElementById('user-credits').innerText = userCredits;
-
-                const adTemplates = [
+const adTemplates = [
                     🔥 استعد لتجربة فريدة مع ${name}! \n\n✨ ${desc || 'أفضل جودة وأفضل سعر لفترة محدودة.'}\n\n👉 احصل عليه الآن واستمتع بالعرض الخاص قبل انتهاء الكمية!,
                     🎯 هل تبحث عن الأفضل؟ ${name} هو الحل الأمثل لك! \n\n💡 ${desc}\n\n🛒 اطلبه اليوم واستفد من الخصم المباشر!
                 ];
@@ -60,11 +15,40 @@ window.login = async () => {
             }
         };
 
-        window.copyAd = () => {
+        document.getElementById('copy-btn').onclick = () => {
             const text = document.getElementById('generated-text').innerText;
             navigator.clipboard.writeText(text);
             alert("تم نسخ الإعلان بنجاح!");
         };
+
+        // متابعة التغيير في حالة المستخدم
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-btn').classList.add('hidden');
+                document.getElementById('user-profile').classList.remove('hidden');
+                document.getElementById('user-avatar').src = user.photoURL || 'https://via.placeholder.com/150';
+                
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    userCredits = userSnap.data().credits ?? 0;
+                } else {
+                    userCredits = 5;
+                    await setDoc(userRef, {
+                        name: user.displayName,
+                        email: user.email,
+                        credits: 5
+                    });
+                }
+                document.getElementById('user-credits').innerText = userCredits;
+            } else {
+                currentUser = null;
+                document.getElementById('login-btn').classList.remove('hidden');
+                document.getElementById('user-profile').classList.add('hidden');
+            }
+        });
     </script>
 </body>
 </html>
